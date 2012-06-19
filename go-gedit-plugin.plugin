@@ -1,0 +1,10 @@
+[Plugin]
+Loader=python
+Module=go-gedit-plugin
+IAge=3
+Name=Go plugin
+Description=Go programming language plugin.
+Authors=Juan Carlos Canaza Ayarachi <jccarlos.a@gmail.com>
+Icon=pair_char_completion
+Copyright=Copyright © 2012 Juan Carlos Canaza Ayarachi
+Version=0.1
