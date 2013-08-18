@@ -74,9 +74,8 @@ class GoProvider(GObject.Object, gsv.CompletionProvider):
         cursor_offset = cursor_iter.get_offset()
         text = buffer.get_text(buffer.get_start_iter(), buffer.get_end_iter(), False)
         byte_offset = len(buffer.get_text(buffer.get_start_iter(), buffer.get_iter_at_offset(cursor_offset), True))
-        print(str(text))
         try:
-            p = subprocess.Popen([self._plugin.gobin_path + '/gocode',
+            p = subprocess.Popen(['gocode',
                                 '-f=json',
                                 'autocomplete',
                                 buffer.get_uri_for_display(),
@@ -85,35 +84,37 @@ class GoProvider(GObject.Object, gsv.CompletionProvider):
                                 stdout=subprocess.PIPE,
                                 stderr=subprocess.PIPE)
         except OSError as e:
-            dialog = Gtk.MessageDialog(flags=Gtk.DIALOG_DESTROY_WITH_PARENT,
-                                       type=Gtk.MESSAGE_ERROR,
-                                       buttons=gtk.BUTTONS_OK)
+            dialog = Gtk.MessageDialog(flags=Gtk.DialogFlags.MODAL,
+                                        type=Gtk.MessageType.ERROR,
+                                        buttons=Gtk.ButtonsType.OK,
+                                        message_format='Error:')
             dialog.set_markup(_("An error occurred when <i>gocode</i> was attempted to run:"))
             dialog.format_secondary_markup('<span font_family="monospace">' +
-                                           glib.markup_escape_text(str(e)) +
+                                           str(e) +
                                            '</span>')
             dialog.run()
             dialog.destroy()
             return []
 
-        stdoutdata, stderrdata = p.communicate(text)
+        stdoutdata, stderrdata = p.communicate(str(text).encode())
 
         if len(stderrdata) != 0:
-            dialog = gtk.MessageDialog(flags=Gtk.DIALOG_DESTROY_WITH_PARENT,
-                                       type=Gtk.MESSAGE_ERROR,
-                                       buttons=gtk.BUTTONS_OK)
+            dialog = Gtk.MessageDialog(flags=Gtk.DialogFlags.MODAL,
+                                        type=Gtk.MessageType.ERROR,
+                                        buttons=Gtk.ButtonsType.OK,
+                                        message_format='Error:')
             dialog.set_markup(_("An error occurred while running <i>gocode</i>:"))
             if len(stderrdata) > utils.MAX_ERR_MSG_LEN: # cut down too long error messages
                 stderrdata = stderrdata[:utils.MAX_ERR_MSG_LEN] + "..."
             dialog.format_secondary_markup('<span font_family="monospace">' +
-                                           glib.markup_escape_text(stderrdata) +
+                                           stderrdata +
                                            '</span>')
             dialog.run()
             dialog.destroy()
             return []
 
         try:
-            return json.loads(stdoutdata)
+            return json.loads(stdoutdata.decode())
         except ValueError:
             print("ERROR: gocode input was invalid.")
             return []
