@@ -15,7 +15,7 @@
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from gi.repository import GObject, Gtk, GdkPixbuf, Gedit
-from completion import GoProvider
+from .completion import GoProvider
 import sys
 import os
 

@@ -1,5 +1,5 @@
 [Plugin]
-Loader=python
+Loader=python3
 Module=go-gedit-plugin
 IAge=3
 Name=Go plugin

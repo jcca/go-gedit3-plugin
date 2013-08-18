@@ -16,9 +16,11 @@
 
 from gi.repository import Gio, GObject, Pango, Gtk, Gdk
 from gi.repository import GtkSource as gsv
-import utils
+from . import utils
 import subprocess
 import json
+
+
 class GoProvider(GObject.Object, gsv.CompletionProvider):
     __gtype_name__ = 'GoProvider'
 
@@ -26,7 +28,7 @@ class GoProvider(GObject.Object, gsv.CompletionProvider):
         GObject.Object.__init__(self)
         self._plugin = plugin
 
-    def do_get_start_iter(self, context, proposal, iter):        
+    def do_get_start_iter(self, context, proposal, iter):
         return False
 
     def do_get_name(self):
@@ -55,7 +57,7 @@ class GoProvider(GObject.Object, gsv.CompletionProvider):
         if not odata:
             # no proposals
             return context.add_proposals(self, [], True)
-        
+
         proposals = []
         for po in self._get_podata(odata):
                 proposals.append(gsv.CompletionItem.new(po[0], po[1], po[2], po[3]))
@@ -68,7 +70,7 @@ class GoProvider(GObject.Object, gsv.CompletionProvider):
     def _get_odata(self, buffer, cursor_iter):
         """
         Return gocode object data.
-        """ 
+        """
         cursor_offset = cursor_iter.get_offset()
         text = buffer.get_text(buffer.get_start_iter(), buffer.get_end_iter(), False)
         byte_offset = len(buffer.get_text(buffer.get_start_iter(), buffer.get_iter_at_offset(cursor_offset), True))
@@ -95,7 +97,7 @@ class GoProvider(GObject.Object, gsv.CompletionProvider):
             return []
 
         stdoutdata, stderrdata = p.communicate(text)
-       
+
         if len(stderrdata) != 0:
             dialog = gtk.MessageDialog(flags=Gtk.DIALOG_DESTROY_WITH_PARENT,
                                        type=Gtk.MESSAGE_ERROR,
@@ -113,7 +115,7 @@ class GoProvider(GObject.Object, gsv.CompletionProvider):
         try:
             return json.loads(stdoutdata)
         except ValueError:
-            print "ERROR: gocode input was invalid."
+            print("ERROR: gocode input was invalid.")
             return []
 
     def _get_podata(self, odata):
