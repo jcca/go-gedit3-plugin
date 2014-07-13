@@ -29,7 +29,8 @@ class GoProvider(GObject.Object, gsv.CompletionProvider):
         self._plugin = plugin
 
     def do_get_start_iter(self, context, proposal, iter):
-        return False
+        iter.assign(context.get_iter())
+        return True
 
     def do_get_name(self):
         return _("Go code completion")
@@ -128,6 +129,8 @@ class GoProvider(GObject.Object, gsv.CompletionProvider):
             if candidate['class'] == "func":
                 info = candidate['class'] + " " + candidate['name'] + candidate['type'][len("func"):]
                 icon = self._plugin.icons['func']
+                # if we have a function add a parenthesis for the code completion
+                candidate['name'] += '('
             else:
                 info = candidate['class'] + " " + candidate['name'] + " " + candidate['type']
 
