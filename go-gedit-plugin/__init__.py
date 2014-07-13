@@ -29,10 +29,13 @@ class GoPlugin(GObject.Object, Gedit.WindowActivatable):
         self.views = {}
         self.icons = {}
         self.gobin_path = os.getenv("GOBIN", "")
+        self.go_path = os.getenv("GOPATH", "")
         self._icons_path = os.path.dirname(__file__) + os.sep + "icons" + os.sep
         self._provider = GoProvider(self)
         # load completion icons
         self._load_completion_icons()
+        #update path to find gocode
+        self.update_path()
 
     def do_activate(self):
         self.do_update_state()
@@ -42,6 +45,22 @@ class GoPlugin(GObject.Object, Gedit.WindowActivatable):
 
     def do_update_state(self):
         self.update_ui()
+
+    def update_path(self):
+        print("update path called")
+        # make sure $GOBIN is in $PATH
+        path = os.environ["PATH"]
+        paths = os.getenv("PATH", "").split(":")
+        #The person doesn't have a GOBIN setup
+        if self.gobin_path == "":
+            if self.go_path not in paths:
+               path += ":" + self.go_path + os.sep + "bin"
+        #The person doesn't have a GOPATH set up
+        elif self.go_path == "":
+            if self.gobin_path not in paths:
+                path += ":" + self.gobin_path
+        os.environ["PATH"] = path
+
     def update_ui(self):
         for view in self.window.get_views():
             completion = view.get_completion()
