@@ -47,7 +47,6 @@ class GoPlugin(GObject.Object, Gedit.WindowActivatable):
         self.update_ui()
 
     def update_path(self):
-        print("update path called")
         # make sure $GOBIN is in $PATH
         path = os.environ["PATH"]
         paths = os.getenv("PATH", "").split(":")
@@ -64,7 +63,8 @@ class GoPlugin(GObject.Object, Gedit.WindowActivatable):
     def update_ui(self):
         for view in self.window.get_views():
             completion = view.get_completion()
-            completion.add_provider(self._provider)
+            if self._provider not in completion.get_providers():
+                completion.add_provider(self._provider)
 
     def _load_completion_icons(self):
         self.icons['var'] = GdkPixbuf.Pixbuf.new_from_file(self._icons_path + "var16.png")
