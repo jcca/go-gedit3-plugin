@@ -38,8 +38,14 @@ class GoProvider(GObject.Object, gsv.CompletionProvider):
     def do_get_icon(self):
         return self._plugin.icons['gopher']
 
+    def get_buffer(self, context):
+        if isinstance(context.get_iter(), tuple):
+            return context.get_iter()[1].get_buffer()
+        else:
+            return context.get_iter().get_buffer()
+
     def do_match(self, context):
-        lang = context.get_iter()[1].get_buffer().get_language()
+        lang = self.get_buffer(context).get_language()
 
         if not lang:
             return False
@@ -52,7 +58,7 @@ class GoProvider(GObject.Object, gsv.CompletionProvider):
     def do_populate(self, context):
         it = context.get_iter()
 
-        buffer = context.get_iter()[1].get_buffer()
+        buffer = self.get_buffer(context)
         odata = self._get_odata(buffer, utils.get_iter_cursor(buffer))
 
         if not odata:
