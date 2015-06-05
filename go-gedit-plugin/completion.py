@@ -29,7 +29,7 @@ class GoProvider(GObject.Object, gsv.CompletionProvider):
         self._plugin = plugin
 
     def do_get_start_iter(self, context, proposal):
-        iter.assign(context.get_iter())
+        # iter.assign(context.get_iter())
         return True
 
     def do_get_name(self):
