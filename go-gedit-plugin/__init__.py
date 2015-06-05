@@ -41,7 +41,10 @@ class GoPlugin(GObject.Object, Gedit.WindowActivatable):
         self.do_update_state()
 
     def do_deactivate(self):
-        print("")
+        for view in self.window.get_views():
+            completion = view.get_completion()
+            if self._provider in completion.get_providers():
+                completion.remove_provider(self._provider)
 
     def do_update_state(self):
         self.update_ui()
